@@ -1,0 +1,11 @@
+# Ignore build files and binaries
+/build/
+/*.exe
+*.o
+*.obj
+*.log
+*.tmp
+*.dll
+
+# VS Code settings
+.vscode/
