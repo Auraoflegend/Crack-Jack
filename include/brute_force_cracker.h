@@ -1,12 +1,14 @@
 #pragma once
-#include <string>
-#include "optimizer.h"  // ✅ Required for OptimizerFlags
+#include <string>     // for std::string
+#include <ostream>    // for std::ostream
+#include "optimizer.h"
+#include "resume_manager.h"
 
-
-
-bool crackBruteForceMultithreaded(const std::string& hash,
+bool crackBruteForceMultithreaded(const std::string& targetHash,
                                   const std::string& algorithm,
-                                  const std::string& charset,
+                                  const std::string& mask,
                                   int minLen, int maxLen,
-                                  int threads,
-                                  const OptimizerFlags& optim);
+                                  int numThreads,
+                                  const OptimizerFlags& optim,
+                                  std::ostream* logStream = nullptr,
+                                  const std::string& resumePath = "");

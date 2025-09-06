@@ -8,7 +8,7 @@
 #include <thread>
 #include <windows.h>
 
-void crackWithWordlist(const std::string& target, const std::string& algo, const std::string& wordlistPath) {
+void crackWithWordlist(const std::string& target, const std::string& algo, const std::string& wordlistPath, std::ostream* log) {
     std::ifstream file(wordlistPath);
     if (!file) {
         std::cerr << "[!] Could not open wordlist: " << wordlistPath << "\n";
@@ -24,6 +24,7 @@ void crackWithWordlist(const std::string& target, const std::string& algo, const
     size_t totalWords = words.size();
     size_t tries = 0;
     bool found = false;
+    std::string crackedPassword = "";
     auto start = std::chrono::steady_clock::now();
 
     for (const auto& word : words) {
@@ -31,12 +32,15 @@ void crackWithWordlist(const std::string& target, const std::string& algo, const
         ++tries;
 
         if (target == hashed) {
-            std::cout << target << ":" << algo << ":" << word << "\n";
+            std::string result = target + ":" + algo + ":" + word;
+            std::cout << result << "\n";
+            if (log) (*log) << result << "\n";
             found = true;
+            crackedPassword = word;
             break;
         }
 
-        // Optional: show live status when pressing Spacebar
+        // Optional: show live status on Spacebar
         if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
             auto now = std::chrono::steady_clock::now();
             double elapsed = std::chrono::duration<double>(now - start).count();
@@ -50,12 +54,14 @@ void crackWithWordlist(const std::string& target, const std::string& algo, const
                       << " | Speed: " << static_cast<size_t>(speed) << "/sec"
                       << std::endl;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(300)); // debounce
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 
     if (!found) {
-        std::cout << target << ":" << algo << ":NOT_FOUND\n";
+        std::string result = target + ":" + algo + ":NOT_FOUND";
+        std::cout << result << "\n";
+        if (log) (*log) << result << "\n";
     }
 
     auto end = std::chrono::steady_clock::now();
@@ -66,4 +72,15 @@ void crackWithWordlist(const std::string& target, const std::string& algo, const
               << " | Attempts: " << tries
               << " | Speed: " << static_cast<size_t>(speed) << "/sec"
               << std::endl;
+
+    if (log) {
+        (*log) << "[LOG] Cracked: " << (found ? "true" : "false") << "\n";
+        (*log) << "Hash   : " << target << "\n";
+        (*log) << "Algo   : " << algo << "\n";
+        (*log) << "Tries  : " << tries << "\n";
+        (*log) << "Time   : " << duration << "s\n";
+        (*log) << "Speed  : " << static_cast<size_t>(speed) << "/sec\n";
+        (*log) << "Password: " << (found ? crackedPassword : "NOT_FOUND") << "\n";
+        (*log) << "-----------------------------\n";
+    }
 }

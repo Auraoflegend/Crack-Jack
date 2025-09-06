@@ -1,34 +1,17 @@
-#ifndef HASH_UTILS_H
-#define HASH_UTILS_H
+#pragma once
 
 #include <string>
+#include "batch_hash.h"  // For HashAlgorithm enum
 
-// Hash functions
-std::string md5(const std::string&);
-std::string sha1(const std::string&);
-std::string sha256(const std::string&);
-std::string sha512(const std::string&);
-std::string ntlm(const std::string&);
+// === Individual Hash Functions ===
+std::string md5(const std::string& input);
+std::string sha1(const std::string& input);
+std::string sha256(const std::string& input);
+std::string sha512(const std::string& input);
+std::string ntlm(const std::string& input);
 
-// Unified hashing interface
-std::string hashString(const std::string& input, const std::string& algo);
+// === Enum-based Dispatch ===
+std::string computeHash(HashAlgorithm algo, const std::string& input);
 
-// Define internal hash types
-enum HashType {
-    HASH_UNKNOWN = 0,
-    HASH_MD5,
-    HASH_SHA1,
-    HASH_SHA256,
-    HASH_SHA512,
-    HASH_NTLM,
-    HASH_BCRYPT,
-    HASH_PBKDF2,
-    HASH_SCRYPT
-};
-
-// Optimizer helper functions
-bool isSalted(HashType type);
-bool isIterated(HashType type);
-bool isRawHash(HashType type);
-
-#endif
+// === String-based Dispatch (for legacy CLI or benchmark) ===
+std::string hashString(const std::string& input, const std::string& algorithm);
